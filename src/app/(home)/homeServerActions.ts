@@ -23,7 +23,6 @@ export async function getArtists(): Promise<Artist[]> {
     console.error("Error in getArtists:", error);
     return [];
   }
-
 }
 
 export async function fetchTestimonials():Promise<Testimonials[]> {
