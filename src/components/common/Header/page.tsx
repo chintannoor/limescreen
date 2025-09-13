@@ -128,7 +128,7 @@ const Header = () => {
                                 aria-expanded="false"
                               >
                                 <img
-                                  src={`https://admin.limescreen.net${session?.user.file}`}
+                                  src={`https://admin.anantainternationals.com${session?.user.file}`}
                                   alt="profile-photo"
                                   className="mr-2 rounded"
                                 />
@@ -274,7 +274,7 @@ const Header = () => {
                                     aria-expanded="false"
                                   >
                                     <img
-                                      src={`https://admin.limescreen.net${session?.user.file}`}
+                                      src={`https://admin.anantainternationals.com${session?.user.file}`}
                                       alt="profile-photo"
                                       className="mr-2 rounded"
                                     />
@@ -394,7 +394,7 @@ const Header = () => {
                             aria-expanded="false"
                           >
                             <img
-                              src={`https://admin.limescreen.net${session?.user.file}`}
+                              src={`https://admin.anantainternationals.com${session?.user.file}`}
                               alt="profile-photo"
                               className="mr-2 rounded"
                             />

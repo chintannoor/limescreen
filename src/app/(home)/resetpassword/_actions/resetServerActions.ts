@@ -2,7 +2,7 @@
 export const resetPassword = async (mobile:string, password:string) => {
 
   try {
-    const response = await fetch("https://admin.limescreen.net/api/resetPassword", {
+    const response = await fetch("https://admin.anantainternationals.com/api/resetPassword", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

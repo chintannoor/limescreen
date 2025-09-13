@@ -15,7 +15,7 @@ export async function loginAction(formData: LoginFormInputs) {
     const validatedData = loginSchema.parse({ email, password });
 
     // API call for login
-    const response = await fetch('https://admin.limescreen.net/api/login', {
+    const response = await fetch('https://admin.anantainternationals.com/api/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

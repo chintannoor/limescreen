@@ -1,6 +1,6 @@
 export async function sharedViewProfile(userlink: string) {
     try {
-        const response = await fetch(`https://admin.limescreen.net/api/${userlink}`, {
+        const response = await fetch(`https://admin.anantainternationals.com/api/${userlink}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

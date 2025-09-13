@@ -47,11 +47,11 @@ const TermsAndConditions = () => {
                     These terms and conditions (“Terms of Use”), apply to the
                     entire contents of the Websites under the domain name{" "}
                     <a
-                      href="https://admin.limescreen.net/"
+                      href="https://admin.anantainternationals.com/"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      https://admin.limescreen.net/
+                      https://admin.anantainternationals.com/
                     </a>
                     , (the “Website”), including any functionality and services
                     offered on or through each of the Websites, to any products,

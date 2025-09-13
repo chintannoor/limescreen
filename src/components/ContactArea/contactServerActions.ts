@@ -5,7 +5,7 @@ export async function handleContactForm(formData: ContactFormInput) {
   // Convert FormData to an object
 
   try {
-    const response = await fetch("https://admin.limescreen.net/api/addContact", {
+    const response = await fetch("https://admin.anantainternationals.com/api/addContact", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

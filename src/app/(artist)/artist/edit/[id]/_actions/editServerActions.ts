@@ -13,7 +13,7 @@ export async function editProfile(id: string): Promise<APIResponse> {
   }
 
   try {
-    const response = await fetch("https://admin.limescreen.net/api/editProfile", {
+    const response = await fetch("https://admin.anantainternationals.com/api/editProfile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export async function updateProfileImage(
     formData.append("file", file);
 
     const response = await fetch(
-      "https://admin.limescreen.net/api/updateProfileImage",
+      "https://admin.anantainternationals.com/api/updateProfileImage",
       {
         method: "POST",
         body: formData,
@@ -64,7 +64,7 @@ export async function updateProfileImage(
 export async function updateClientData(data: InitialData) {
   try {
     const response = await fetch(
-      "https://admin.limescreen.net/api/updateClientData",
+      "https://admin.anantainternationals.com/api/updateClientData",
       {
         method: "POST",
         headers: {
@@ -86,7 +86,7 @@ export async function updateClientData(data: InitialData) {
 
 export async function deleteImage(id: string, imageId: string) {
   try {
-    const response = await fetch("https://admin.limescreen.net/api/deleteImage", {
+    const response = await fetch("https://admin.anantainternationals.com/api/deleteImage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export async function deleteImage(id: string, imageId: string) {
 
 export async function deleteVideo(id: string, videoId: string) {
   try {
-    const response = await fetch("https://admin.limescreen.net/api/deleteVideo", {
+    const response = await fetch("https://admin.anantainternationals.com/api/deleteVideo", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export async function updateColor(
     }
 
     // Send the POST request
-    const response = await fetch("https://admin.limescreen.net/api/updateColor", {
+    const response = await fetch("https://admin.anantainternationals.com/api/updateColor", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -158,7 +158,7 @@ export async function updateColor(
 
 export async function getCountryList(): Promise<CountryList> {
   try {
-    const response = await fetch("https://admin.limescreen.net/api/countryList", {
+    const response = await fetch("https://admin.anantainternationals.com/api/countryList", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -183,7 +183,7 @@ export async function getStatesByCountry(
   country_id: string
 ): Promise<StatesList> {
   try {
-    const response = await fetch("https://admin.limescreen.net/api/fetchStates", {
+    const response = await fetch("https://admin.anantainternationals.com/api/fetchStates", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -205,7 +205,7 @@ export async function getStatesByCountry(
 
 export async function getCityByState(state_id: string): Promise<CityList> {
   try {
-    const response = await fetch("https://admin.limescreen.net/api/fetchCities", {
+    const response = await fetch("https://admin.anantainternationals.com/api/fetchCities", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -230,7 +230,7 @@ export async function uploadImageAction(id: string, file: File) {
     formData.append("id", id);
     formData.append("file", file);
 
-    const response = await fetch(" https://admin.limescreen.net/api/uploadImage", {
+    const response = await fetch(" https://admin.anantainternationals.com/api/uploadImage", {
       method: "POST",
       body: formData,
     });
@@ -252,7 +252,7 @@ export async function uploadVideoAction(id: string, file: File) {
     formData.append("id", id);
     formData.append("file", file);
 
-    const response = await fetch("  https://admin.limescreen.net/api/uploadVideo", {
+    const response = await fetch("  https://admin.anantainternationals.com/api/uploadVideo", {
       method: "POST",
       body: formData,
     });

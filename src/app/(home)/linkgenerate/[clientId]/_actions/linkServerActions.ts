@@ -2,7 +2,7 @@ import { CoupenApplyFormInputs } from "@/types/zodValidation";
 
 export const applyCoupon = async (formData: CoupenApplyFormInputs) : Promise<any> => {
   try {
-    const response = await fetch(" https://admin.limescreen.net/api/coupenApply", {
+    const response = await fetch(" https://admin.anantainternationals.com/api/coupenApply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

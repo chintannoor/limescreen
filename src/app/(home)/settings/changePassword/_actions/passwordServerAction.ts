@@ -3,7 +3,7 @@ export async function changePassword(id:string,current_password:string,new_passw
 
   // Implement password change logic
   try {
-    const response = await fetch("https://admin.limescreen.net/api/changePassword", {
+    const response = await fetch("https://admin.anantainternationals.com/api/changePassword", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

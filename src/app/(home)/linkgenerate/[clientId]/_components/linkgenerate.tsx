@@ -95,7 +95,7 @@ const LinkGeneratePage = () => {
                   target="_blank"
                   className="btn btn-primary w-100"
                 >
-                  https://admin.limescreen.net/{`profile/${session?.user.link}`}
+                  https://admin.anantainternationals.com/{`profile/${session?.user.link}`}
                 </Link>
               </>
             )}

@@ -48,7 +48,7 @@ const SharedViewProfilePage = () => {
 
         // Fetch data from the given URL using GET method
         const response = await fetch(
-          `https://admin.limescreen.net/api/${userlink}`,
+          `https://admin.anantainternationals.com/api/${userlink}`,
           {
             method: "GET",
           }
@@ -113,7 +113,7 @@ const SharedViewProfilePage = () => {
           <div className="logo-area">
             <a>
               <img
-                src={`https://admin.limescreen.net${userData?.artist.file}`}
+                src={`https://admin.anantainternationals.com${userData?.artist.file}`}
                 alt="personal-logo"
               />
             </a>
@@ -400,7 +400,7 @@ const SharedViewProfilePage = () => {
             <div className="logo">
               <Link href="/">
                 <img
-                  src={`https://admin.limescreen.net${userData?.artist.file}`}
+                  src={`https://admin.anantainternationals.com${userData?.artist.file}`}
                   alt="Logo"
                 />
               </Link>
@@ -452,7 +452,7 @@ const SharedViewProfilePage = () => {
             <div className="menu-header">
               <Link href="/" className="logo">
                 <img
-                  src={`https://admin.limescreen.net${userData?.artist.file}`}
+                  src={`https://admin.anantainternationals.com${userData?.artist.file}`}
                   alt="Personal Portfolio"
                 />
               </Link>
@@ -654,7 +654,7 @@ const SharedViewProfilePage = () => {
                     <img
                       id="border"
                       className="gradient-border"
-                      src={`https://admin.limescreen.net${userData?.artist.file}`}
+                      src={`https://admin.anantainternationals.com${userData?.artist.file}`}
                       alt="User"
                     />
                   </div>
@@ -1267,10 +1267,10 @@ const SharedViewProfilePage = () => {
                                   data-fancybox="gallery"
                                 >
                                   <a
-                                    href={`https://admin.limescreen.net${image.images}`}
+                                    href={`https://admin.anantainternationals.com${image.images}`}
                                   >
                                     <img
-                                      src={`https://admin.limescreen.net${image.images}`}
+                                      src={`https://admin.anantainternationals.com${image.images}`}
                                       alt={`Client-image-${index}`}
                                     />
                                   </a>
@@ -1314,7 +1314,7 @@ const SharedViewProfilePage = () => {
                               <div className="inner text-center">
                                 <video width="150" height="200" controls>
                                   <source
-                                    src={`https://admin.limescreen.net${video.videos}`}
+                                    src={`https://admin.anantainternationals.com${video.videos}`}
                                     type="video/mp4"
                                   />
                                 </video>

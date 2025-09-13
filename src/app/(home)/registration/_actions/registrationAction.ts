@@ -8,7 +8,7 @@ export async function sendOtpAction(mobile: string) {
   // Example:
   try {
     const response = await fetch(
-      "https://admin.limescreen.net/api/sendOtpForRegistration",
+      "https://admin.anantainternationals.com/api/sendOtpForRegistration",
       {
         method: "POST",
         headers: {
@@ -34,7 +34,7 @@ export async function verifyOtpAction(otp: string, mobile: string) {
   // Implement OTP verification logic
   try {
     const response = await fetch(
-      "https://admin.limescreen.net/api/verifyOtpForRegistration",
+      "https://admin.anantainternationals.com/api/verifyOtpForRegistration",
       {
         method: "POST",
         headers: {
@@ -76,7 +76,7 @@ export async function registerAction(formData: RegisterFormInputs) {
     });
 
     // API call for registration
-    const response = await fetch("https://admin.limescreen.net/api/register", {
+    const response = await fetch("https://admin.anantainternationals.com/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

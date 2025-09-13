@@ -63,7 +63,7 @@ const ActorForm = () => {
                         <>
                           <img
                             className="card-img-top"
-                            src={`https://admin.limescreen.net${artist.file!}`}
+                            src={`https://admin.anantainternationals.com${artist.file!}`}
                             alt="Card image cap"
                           />
                           <div className="card-body">

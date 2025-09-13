@@ -7,7 +7,7 @@ export async function viewProfile(link: string, id: string) {
   const requestBody = JSON.stringify({ link, id });
 
   try {
-    const response = await fetch("https://admin.limescreen.net/api/viewProfile", {
+    const response = await fetch("https://admin.anantainternationals.com/api/viewProfile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -9,7 +9,7 @@ export async function getAllActors(page = 1): Promise<{
 }> {
   try {
     const response = await fetch(
-      `https://admin.limescreen.net/api/getActors?page=${page}`,
+      `https://admin.anantainternationals.com/api/getActors?page=${page}`,
       {
         method: "POST",
         headers: {
@@ -46,7 +46,7 @@ export async function getAllModels(page = 1): Promise<{
 }> {
   try {
     const response = await fetch(
-      `https://admin.limescreen.net/api/getModels?page=${page}`,
+      `https://admin.anantainternationals.com/api/getModels?page=${page}`,
       {
         method: "POST",
         headers: {

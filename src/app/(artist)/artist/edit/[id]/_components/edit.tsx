@@ -608,7 +608,7 @@ export default function ProfileSettings() {
                         id="profilePic"
                         className="pic"
                         defaultValue={profilePic}
-                        src={`https://admin.limescreen.net${profilePic}`}
+                        src={`https://admin.anantainternationals.com${profilePic}`}
                       />
                       <input
                         className="uploadProfileInput"
@@ -1999,7 +1999,7 @@ export default function ProfileSettings() {
                           className={`input-img data-image mb-3 data-image-id-${item.id}`}
                         >
                           <img
-                            src={`https://admin.limescreen.net${item.images}`}
+                            src={`https://admin.anantainternationals.com${item.images}`}
                             className="img-responsive"
                             style={{ height: "200px", width: "200px" }}
                             alt=""
@@ -2106,7 +2106,7 @@ export default function ProfileSettings() {
                               style={{ position: "relative" }}
                             >
                               <source
-                                src={`https://admin.limescreen.net${item.videos}`}
+                                src={`https://admin.anantainternationals.com${item.videos}`}
                                 type="video/mp4"
                               />
                             </video>

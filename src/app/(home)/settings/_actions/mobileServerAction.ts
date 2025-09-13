@@ -2,7 +2,7 @@
 export async function sendOtpOnMobileNo(mobile: string) {
   try {
     const response = await fetch(
-      "https://admin.limescreen.net/api/sendOtpOnMobileNo",
+      "https://admin.anantainternationals.com/api/sendOtpOnMobileNo",
       {
         method: "POST",
         headers: {
@@ -29,7 +29,7 @@ export async function verifyOtpOnMobileNo(
   otp: string
 ) {
   try {
-    const response = await fetch("https://admin.limescreen.net/api/verifyOtp", {
+    const response = await fetch("https://admin.anantainternationals.com/api/verifyOtp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export async function changeMobileNo(mobile: string, id: string) {
 
   try {
     // Send request to the external API
-    const response = await fetch("https://admin.limescreen.net/api/changeMobileNo", {
+    const response = await fetch("https://admin.anantainternationals.com/api/changeMobileNo", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
