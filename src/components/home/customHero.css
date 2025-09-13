@@ -1,0 +1,71 @@
+.swiper-pagination-bullet {
+  width: 10px !important; /* Width of the dots */
+  height: 10px !important;
+  display: inline-block;
+  border: 2px solid green !important; /* Green border for inactive dots */
+  border-radius: var(--swiper-pagination-bullet-border-radius, 50%);
+  background: transparent !important; /* Transparent background for inactive dots */
+  opacity: 1 !important; /* Full opacity for inactive dots */
+}
+
+.swiper-pagination-bullet-active {
+  background: green !important; /* Solid green for active dot */
+}
+
+.hero-slider .swiper-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet,
+.hero-slider .swiper-pagination-horizontal.swiper-pagination-bullets .swiper-pagination-bullet {
+  margin: 0 var(--swiper-pagination-bullet-horizontal-gap, 4px) !important; /* Space between dots */
+  margin-top: 18px !important; /* Adjust this value to move the dots down */
+}
+/* Optional: Styling for white semi-circle */
+.hero-slider .swiper-pagination {
+  position: absolute;
+  top: 10px; /* Adjust to align with white semi-circle */
+  left: 55%;
+  transform: translateX(-50%);
+  background-color: white;
+  border-radius: 50%;
+  width: 100px; /* Adjust width */
+}
+
+.hero-slider .swiper-pagination-fraction,
+.hero-slider .swiper-pagination-custom,
+.hero-slider .swiper-horizontal > .swiper-pagination-bullets,
+.hero-slider .swiper-pagination-bullets.swiper-pagination-horizontal {
+  bottom: var(--swiper-pagination-bottom, -50px) !important;
+  top: var(--swiper-pagination-top, auto);
+  width: 70px !important; /* Adjust width */
+  left: 50%;
+  height: 14% !important; /* Adjust height */
+  background-color: white !important;
+  border-radius: 50%;
+}
+
+
+.swiper-button-next {
+  opacity: 0;
+}
+
+.swiper-button-next:hover {
+  opacity: 1;
+  background-color: green;
+  color: white;
+  width: 50px;
+  height: 60px;
+}
+
+.swiper-button-prev {
+  opacity: 0;
+}
+
+.swiper-button-prev:hover {
+  opacity: 1;
+  background-color: green;
+  color: white;
+  width: 50px;
+  height: 60px;
+}
+
+
+  
+  

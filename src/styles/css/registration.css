@@ -1,0 +1,72 @@
+.hide {
+    display: none;
+  }
+  .togpassregister {
+    margin-left: 400px;
+    position: absolute;
+    cursor: pointer;
+  }
+  .input-block {
+    position: relative;
+  }
+  .togalcurrentpass {
+    position: absolute;
+    right: 10px;
+    top: -5;
+  }
+  .closebuttonicon {
+    background-color: #60a008 !important;
+    padding: 5px 10px !important;
+    border-radius: 50px !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+  }
+  .closebuttonicon h5 {
+    margin-bottom: 0;
+    font-size: 18px;
+  }
+  .closebuttonicon h5 i {
+    font-size: 20px;
+  }
+  .closebuttoniconvideo {
+    background-color: #60a008 !important;
+    padding: 5px 10px !important;
+    border-radius: 50px !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+  }
+  .closebuttoniconvideo h5 {
+    margin-bottom: 0;
+    font-size: 18px;
+  }
+  .closebuttoniconvideo h5 i {
+    font-size: 20px;
+  }
+  @media only screen and (max-width: 600px) {
+    .togpassregister {
+      margin-left: 250px;
+    }
+    .closebuttoniconvideo {
+      margin-top: 20px;
+    }
+  }
+  p {
+    -webkit-user-select: all; /* Safari */
+    -ms-user-select: all;
+    user-select: all;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  #mytext {
+    outline: none;
+    background: none;
+    width: 25%;
+    padding: 10px 10px;
+    border: 1px solid #eeeeee;
+    font-size: 1em;
+    font-weight: 100;
+    margin-bottom: 1em;
+  }
+  

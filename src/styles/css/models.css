@@ -1,0 +1,12 @@
+.starter-template {
+    padding: 40px 15px;
+  }
+  .card-img-top {
+    width: 300px;
+    height: 250px;
+  }
+  @media screen and (max-width: 400px) {
+    .card-img-top {
+      width: 100%;
+    }
+  }

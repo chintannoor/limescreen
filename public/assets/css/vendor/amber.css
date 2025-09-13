@@ -1,0 +1,5 @@
+:root {
+    --color-primary: #FFC107;
+    --color-subtitle: #FFC107;
+    --gradient-red-hover: linear-gradient(145deg, #FFC107, #91e400);
+}

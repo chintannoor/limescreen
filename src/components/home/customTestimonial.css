@@ -1,0 +1,69 @@
+
+.testimonial-area .swiper-pagination-fraction,
+.swiper-pagination-custom,
+.swiper-horizontal > .swiper-pagination-bullets,
+.swiper-pagination-bullets.swiper-pagination-horizontal {
+  bottom: var(--swiper-pagination-bottom, 8px) ;
+  top: var(--swiper-pagination-top, auto);
+  width: auto ; /* Adjust width */
+  background-color: transparent ;
+  border-radius: 50%;
+}
+@media screen and (min-width: 768px) {
+  .testimonial-area .swiper-pagination-fraction,
+  .swiper-pagination-custom,
+  .swiper-horizontal > .swiper-pagination-bullets,
+  .swiper-pagination-bullets.swiper-pagination-horizontal {
+    left: 50%;
+    height: 15% ; /* Adjust height */
+  } 
+}
+
+@media screen and (max-width: 768px) {
+  .testimonial-area .swiper-pagination-fraction,
+  .swiper-pagination-custom,
+  .swiper-horizontal > .swiper-pagination-bullets,
+  .swiper-pagination-bullets.swiper-pagination-horizontal {
+    left: 200px;
+    height: 30px ; /* Adjust height */
+  } 
+}
+
+@media screen and (max-width: 420px) {
+  .testimonial-area .swiper-pagination-fraction,
+  .swiper-pagination-custom,
+  .swiper-horizontal > .swiper-pagination-bullets,
+  .swiper-pagination-bullets.swiper-pagination-horizontal {
+    left: 130px;
+    height: 30px ; /* Adjust height */
+  } 
+}
+
+.testimonial-area .swiper-pagination {
+  position: absolute;
+  text-align: center;
+  transition: 300ms opacity;
+  transform: translate3d(0, 0, 0);
+  z-index: 10;
+  width: 100px; /* Adjust width */
+}
+
+.swiper-pagination-bullet {
+  width: 10px ; /* Width of the dots */
+  height: 10px ;
+  display: inline-block;
+  border: 2px solid green ; /* Green border for inactive dots */
+  border-radius: var(--swiper-pagination-bullet-border-radius, 50%);
+  background: transparent ; /* Transparent background for inactive dots */
+  opacity: 1 ; /* Full opacity for inactive dots */
+}
+
+.swiper-pagination-bullet-active {
+  background: green ; /* Solid green for active dot */
+}
+
+.testimonial-area .swiper-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet,
+.testimonial-area .swiper-pagination-horizontal.swiper-pagination-bullets .swiper-pagination-bullet {
+  margin: 0 var(--swiper-pagination-bullet-horizontal-gap, 4px) ; /* Space between dots */
+  margin-top: 23px;
+}
