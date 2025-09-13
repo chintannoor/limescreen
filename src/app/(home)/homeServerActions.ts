@@ -2,7 +2,7 @@ import { Artist, Investors, Testimonials } from "@/types/types";
 
 export async function getArtists(): Promise<Artist[]> {
   try {
-    const response = await fetch("http://admin.anantainternationals.com/api/getArtists", {
+    const response = await fetch("https://admin.anantainternationals.com/api/getArtists", {
       method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
@@ -28,7 +28,7 @@ export async function getArtists(): Promise<Artist[]> {
 
 export async function fetchTestimonials():Promise<Testimonials[]> {
   try {
-    const response = await fetch(" http://admin.anantainternationals.com/api/getTestimonials", {
+    const response = await fetch(" https://admin.anantainternationals.com/api/getTestimonials", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
