@@ -63,7 +63,7 @@ const TeamArea = () => {
                             rel="noopener noreferrer"
                           >
                             <img
-                              src={`https://admin.anantainternationals.com${artist.file!}`}
+                              src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${artist.file!}`}
                               alt="#"
                             />
                           </a>

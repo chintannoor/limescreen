@@ -82,7 +82,7 @@ const ModelForm = () => {
                         <>
                           <img
                             className="card-img-top"
-                            src={`https://admin.anantainternationals.com${model.file!}`}
+                            src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${model.file!}`}
                             alt={`${model.fname} ${model.lname}`}
                           />
                           <div className="card-body">

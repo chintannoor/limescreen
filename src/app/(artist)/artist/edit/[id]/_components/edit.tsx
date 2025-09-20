@@ -608,7 +608,7 @@ export default function ProfileSettings() {
                         id="profilePic"
                         className="pic"
                         defaultValue={profilePic}
-                        src={`https://admin.anantainternationals.com${profilePic}`}
+                        src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${profilePic}`}
                       />
                       <input
                         className="uploadProfileInput"
@@ -1999,7 +1999,7 @@ export default function ProfileSettings() {
                           className={`input-img data-image mb-3 data-image-id-${item.id}`}
                         >
                           <img
-                            src={`https://admin.anantainternationals.com${item.images}`}
+                            src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${item.images}`}
                             className="img-responsive"
                             style={{ height: "200px", width: "200px" }}
                             alt=""
@@ -2106,7 +2106,7 @@ export default function ProfileSettings() {
                               style={{ position: "relative" }}
                             >
                               <source
-                                src={`https://admin.anantainternationals.com${item.videos}`}
+                                src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${item.videos}`}
                                 type="video/mp4"
                               />
                             </video>

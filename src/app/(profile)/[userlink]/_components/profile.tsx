@@ -113,7 +113,7 @@ const SharedViewProfilePage = () => {
           <div className="logo-area">
             <a>
               <img
-                src={`https://admin.anantainternationals.com${userData?.artist.file}`}
+                src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
                 alt="personal-logo"
               />
             </a>
@@ -400,7 +400,7 @@ const SharedViewProfilePage = () => {
             <div className="logo">
               <Link href="/">
                 <img
-                  src={`https://admin.anantainternationals.com${userData?.artist.file}`}
+                  src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
                   alt="Logo"
                 />
               </Link>
@@ -452,7 +452,7 @@ const SharedViewProfilePage = () => {
             <div className="menu-header">
               <Link href="/" className="logo">
                 <img
-                  src={`https://admin.anantainternationals.com${userData?.artist.file}`}
+                  src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
                   alt="Personal Portfolio"
                 />
               </Link>
@@ -654,7 +654,7 @@ const SharedViewProfilePage = () => {
                     <img
                       id="border"
                       className="gradient-border"
-                      src={`https://admin.anantainternationals.com${userData?.artist.file}`}
+                      src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
                       alt="User"
                     />
                   </div>
@@ -1267,10 +1267,10 @@ const SharedViewProfilePage = () => {
                                   data-fancybox="gallery"
                                 >
                                   <a
-                                    href={`https://admin.anantainternationals.com${image.images}`}
+                                    href={`https://my-limescreen.s3.eu-north-1.amazonaws.com${image.images}`}
                                   >
                                     <img
-                                      src={`https://admin.anantainternationals.com${image.images}`}
+                                      src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${image.images}`}
                                       alt={`Client-image-${index}`}
                                     />
                                   </a>
@@ -1314,7 +1314,7 @@ const SharedViewProfilePage = () => {
                               <div className="inner text-center">
                                 <video width="150" height="200" controls>
                                   <source
-                                    src={`https://admin.anantainternationals.com${video.videos}`}
+                                    src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${video.videos}`}
                                     type="video/mp4"
                                   />
                                 </video>
