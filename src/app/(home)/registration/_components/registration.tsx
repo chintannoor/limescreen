@@ -11,29 +11,33 @@ import {
   verifyOtpAction,
 } from "../_actions/registrationAction";
 import { useRouter } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
-import { loginAction } from "../../login/_actions/loginServerActions";
+import { signIn, getSession } from "next-auth/react";
 
 export default function RegisterForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confPasswordVisible, setConfPasswordVisible] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [formMessage, setFormMessage] = useState("");
+  const [otpBusy, setOtpBusy] = useState(false);
 
-  const { data: session } = useSession();
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
     getValues,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     trigger,
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
   });
 
   const handleSendOtp = async () => {
+    setFormError("");
+    setFormMessage("");
+
     const isValid = await trigger([
       "fname",
       "lname",
@@ -47,93 +51,90 @@ export default function RegisterForm() {
 
     const mobile = getValues("mobile");
     if (!mobile) {
-      alert("Mobile not found.");
+      setFormError("Mobile number is required.");
       return;
     }
 
-    const result = await sendOtpAction(mobile);
-    if (result.status === 200) {
-      setOtpSent(true);
-    } else {
-      alert(result.message || "Failed to send OTP.");
+    setOtpBusy(true);
+    try {
+      const result = await sendOtpAction(mobile);
+      if (result.status === 200) {
+        setOtpSent(true);
+        setFormMessage("OTP sent to your mobile number.");
+      } else {
+        setFormError(result.message || "Failed to send OTP.");
+      }
+    } finally {
+      setOtpBusy(false);
     }
   };
 
   const handleResendOtp = async () => {
     setOtp("");
-    handleSendOtp();
-  }
+    await handleSendOtp();
+  };
 
   const handleOtpVerification = async () => {
     const mobile = getValues("mobile");
     if (!otp) {
-      alert("Please enter the OTP.");
+      setFormError("Please enter the OTP.");
       return false;
     }
     if (!mobile) {
-      alert("Mobile not found.");
+      setFormError("Mobile number is required.");
       return false;
     }
 
     const result = await verifyOtpAction(otp, mobile);
     if (result.status === 200) {
-      // setOtpSent(false);
       return true;
-    } else {
-      alert(result.message || "Invalid OTP.");
-      return false;
     }
+
+    setFormError(result.message || "Invalid OTP.");
+    return false;
   };
 
   const handleFormSubmit = async (data: RegisterFormInputs) => {
-    const isSuccess = await handleOtpVerification();
-    if (!isSuccess) return;
+    setFormError("");
+    setFormMessage("");
+
+    const isVerified = await handleOtpVerification();
+    if (!isVerified) return;
 
     const result = await registerAction(data);
-    if (result && !result.success) {
-      console.error("Registration failed", result?.errors);
-    } else {
-      const loginResult = await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-      });
-
-      if (loginResult?.error) {
-        alert("Mobile/Email Already Registered, Please Login");
-        router.push("/login");
-      } else {
-        const user = await loginAction(data);
-        if (user.status == 400) {
-          alert("Login failed");
-        }
-        router.push(`artist/edit/${user.data.id}`);
-        alert("Registration Successful");
-        setOtpSent(false);
-      }
+    if (!result.success) {
+      setFormError(result.message || "Registration failed.");
+      return;
     }
+
+    const loginResult = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (!loginResult || loginResult.error) {
+      setFormError(
+        "Your account was created, but automatic sign-in failed. Please log in."
+      );
+      router.push("/login");
+      return;
+    }
+
+    const session = await getSession();
+    const id = session?.user?.id;
+
+    if (!id) {
+      router.push("/login");
+      return;
+    }
+
+    setOtpSent(false);
+    router.push(`/artist/edit/${id}`);
   };
 
-  const Togglepass = () => {
-    const passInput = document.querySelector(
-      'input[placeholder="Password"]'
-    ) as HTMLInputElement;
-    if (passInput) {
-      passInput.type = passInput.type === "password" ? "text" : "password";
-    }
-    setPasswordVisible(!passwordVisible);
-  };
-
-  const Toggleconfirmpass = () => {
-    const confirmPassInput = document.querySelector(
-      'input[placeholder="Confirm-Password"]'
-    ) as HTMLInputElement;
-    if (confirmPassInput) {
-      confirmPassInput.type =
-        confirmPassInput.type === "password" ? "text" : "password";
-    }
-    setConfPasswordVisible(!confPasswordVisible);
-  };
+  const Togglepass = () => setPasswordVisible(!passwordVisible);
+  const Toggleconfirmpass = () => setConfPasswordVisible(!confPasswordVisible);
 
   return (
     <>
@@ -149,6 +150,16 @@ export default function RegisterForm() {
               id="myForm"
               method="POST"
             >
+              {formError && (
+                <div className="alert alert-danger" role="alert">
+                  {formError}
+                </div>
+              )}
+              {formMessage && (
+                <div className="alert alert-success" role="status">
+                  {formMessage}
+                </div>
+              )}
               {!otpSent ? (
                 <>
                   <input
@@ -181,8 +192,10 @@ export default function RegisterForm() {
                   <input
                     className="text email"
                     type="text"
+                    inputMode="numeric"
+                    maxLength={10}
                     placeholder="Mobile"
-                    {...register("mobile", { required: true })}
+                    {...register("mobile")}
                     required
                   />
                   <span style={{ color: "red" }}>{errors.mobile?.message}</span>
@@ -231,8 +244,9 @@ export default function RegisterForm() {
                       type="button"
                       className="tp-btn rounded-pill"
                       onClick={handleSendOtp}
+                      disabled={otpBusy}
                     >
-                      Send OTP
+                      {otpBusy ? "Sending..." : "Send OTP"}
                     </button>
                   </div>
                 </>
@@ -241,6 +255,7 @@ export default function RegisterForm() {
                   <input
                     className="text email"
                     type="text"
+                    inputMode="numeric"
                     placeholder="Enter OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
@@ -251,14 +266,16 @@ export default function RegisterForm() {
                       type="submit"
                       className="tp-btn rounded-pill mr-1"
                       style={{ width: "46%" }}
+                      disabled={isSubmitting}
                     >
-                      Verify OTP
+                      {isSubmitting ? "Verifying..." : "Verify OTP"}
                     </button>
                     <button
                       onClick={handleResendOtp}
                       type="button"
                       className="tp-btn rounded-pill"
                       style={{ width: "51%" }}
+                      disabled={otpBusy || isSubmitting}
                     >
                       Resend OTP
                     </button>

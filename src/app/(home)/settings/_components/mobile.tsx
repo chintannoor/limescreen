@@ -29,7 +29,6 @@ const MobileNoChange = () => {
     try {
       const data = await sendOtpOnMobileNo(oldMobileNo); // Use the server action here
       if (data.status === 200) {
-        setOtpSession(data.otpSession); // Update session if provided by the API
         setMessage("OTP sent successfully");
         alert("OTP Is valid only for 60 Seconds");
         setWarningMessage("");

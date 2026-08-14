@@ -6,9 +6,8 @@ import {
   sendOtpOnMobileNo,
   verifyOtpOnMobileNo,
 } from "../../settings/_actions/mobileServerAction";
+import { forgotPasswordSchema } from "@/types/zodValidation";
 import { useRouter } from "next/navigation";
-
-// import axios from 'axios';
 
 const ResetPassword = () => {
   const [mobile, setMobile] = useState("");
@@ -17,46 +16,69 @@ const ResetPassword = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [sendBtn, setSendBtn] = useState(true);
+  const [busy, setBusy] = useState(false);
   const router = useRouter();
 
   const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
 
+    // The password rules were previously unenforced - any single character was
+    // accepted and there was no confirmation field.
+    const parsed = forgotPasswordSchema.safeParse({
+      mobile,
+      password,
+      confirmPassword,
+    });
+
+    if (!parsed.success) {
+      setErrorMessage(
+        parsed.error.errors[0]?.message || "Please check the details entered."
+      );
+      return;
+    }
+
+    setBusy(true);
     try {
-      await resetPassword(mobile, password); // Use the server action from the utility file
-      setSuccessMessage("Password changed successfully.");
-      setErrorMessage("");
-      router.push("/login"); // Redirect to the login page after successful password change
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage("Failed To change Password"); // Use the Error's message property
-      } else {
-        setErrorMessage("An unexpected error occurred.");
+      const result = await resetPassword(mobile, password);
+
+      if (!result.success) {
+        setErrorMessage(result.message || "Failed to change password.");
+        return;
       }
+
+      setSuccessMessage("Password changed successfully.");
+      router.push("/login");
+    } finally {
+      setBusy(false);
     }
   };
 
   const sendOtp = async () => {
-    if (mobile === "") {
-      setErrorMessage("**Fill the mobile no");
+    setSuccessMessage("");
+
+    if (!/^\d{10}$/.test(mobile)) {
+      setErrorMessage("*Enter a valid 10 digit mobile number");
       return;
     }
 
+    setBusy(true);
     try {
-      const data = await sendOtpOnMobileNo(mobile); // Use the server action here
-      if (data.status == 200) {
+      const data = await sendOtpOnMobileNo(mobile);
+      if (data.status === 200) {
         setSuccessMessage("OTP sent successfully");
         setErrorMessage("");
         setOtpSent(true);
       } else {
-        setErrorMessage("Failed to send OTP");
+        setErrorMessage(data.message || "Failed to send OTP");
       }
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Error occurred while sending OTP");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -66,20 +88,21 @@ const ResetPassword = () => {
       return;
     }
 
+    setBusy(true);
     try {
-      const data = await verifyOtpOnMobileNo(mobile, otp); // Use the verifyOtp server action
+      const data = await verifyOtpOnMobileNo(mobile, otp);
 
       if (data.status === 200) {
         setSuccessMessage("Mobile number is verified.");
-        setOtpSent(false); // Clear the session after successful verification
+        setErrorMessage("");
+        setOtpSent(false);
         setShowPasswordFields(true);
         setSendBtn(false);
       } else {
-        setErrorMessage("Invalid OTP");
+        setErrorMessage(data.message || "Invalid OTP");
       }
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Error occurred while verifying OTP");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -89,14 +112,7 @@ const ResetPassword = () => {
     sendOtp();
   };
 
-  const togglePasswordVisibility = () => {
-    const passwordField = document.getElementById(
-      "password"
-    ) as HTMLInputElement;
-    passwordField.type =
-      passwordField.type === "password" ? "text" : "password";
-    setPasswordVisible(!passwordVisible);
-  };
+  const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
 
   return (
     <section className="contact-area reset-password">
@@ -126,9 +142,12 @@ const ResetPassword = () => {
                 <div className="form-group">
                   <input
                     type="text"
+                    inputMode="numeric"
+                    maxLength={10}
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value)}
                     placeholder="Enter Mobile No."
+                    disabled={showPasswordFields}
                     required
                   />
                 </div>
@@ -137,6 +156,7 @@ const ResetPassword = () => {
                     <div className="form-group">
                       <input
                         type="text"
+                        inputMode="numeric"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                         placeholder="Enter OTP"
@@ -144,13 +164,17 @@ const ResetPassword = () => {
                       />
                     </div>
                     <button
+                      type="button"
                       onClick={handleVerifyOtp}
+                      disabled={busy}
                       className="tp-btn reset-btn rounded-pill mr-4"
                     >
                       Verify OTP
                     </button>
                     <button
+                      type="button"
                       onClick={handleResendOtp}
+                      disabled={busy}
                       className="tp-btn reset-btn rounded-pill"
                     >
                       Resend OTP
@@ -158,9 +182,14 @@ const ResetPassword = () => {
                   </>
                 ) : (
                   sendBtn && (
-                    <div className="text-center" onClick={sendOtp}>
-                      <button className="tp-btn reset-btn rounded-pill">
-                        Send OTP
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={sendOtp}
+                        disabled={busy}
+                        className="tp-btn reset-btn rounded-pill"
+                      >
+                        {busy ? "Sending..." : "Send OTP"}
                       </button>
                     </div>
                   )
@@ -169,27 +198,38 @@ const ResetPassword = () => {
               {showPasswordFields && (
                 <form onSubmit={handlePasswordSubmit} className="mt-4">
                   <div className="form-group input-block">
-                  <i
-                  className={`fa ${
-                    passwordVisible ? "fa-eye-slash" : "fa-eye"
-                  } mt-3 togalcurrentpass`}
-                  onClick={togglePasswordVisibility}
-                ></i>
+                    <i
+                      className={`fa ${
+                        passwordVisible ? "fa-eye-slash" : "fa-eye"
+                      } mt-3 togalcurrentpass`}
+                      onClick={togglePasswordVisibility}
+                    ></i>
                     <input
                       type={passwordVisible ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
+                      placeholder="New Password"
                       id="password"
+                      required
+                    />
+                  </div>
+                  <div className="form-group input-block">
+                    <input
+                      type={passwordVisible ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm New Password"
+                      id="confirmPassword"
                       required
                     />
                   </div>
                   <div className="form-group contact-button">
                     <button
                       type="submit"
+                      disabled={busy}
                       className="theme-btn rounded-pill ml-9"
                     >
-                      Change Password
+                      {busy ? "Saving..." : "Change Password"}
                     </button>
                   </div>
                 </form>

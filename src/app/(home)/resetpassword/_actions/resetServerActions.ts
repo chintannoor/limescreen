@@ -1,27 +1,56 @@
-// resetServerActions.js
-export const resetPassword = async (mobile:string, password:string) => {
+"use server";
 
+export type ResetPasswordResult = {
+  success: boolean;
+  status: number;
+  message: string;
+};
+
+export const resetPassword = async (
+  mobile: string,
+  password: string
+): Promise<ResetPasswordResult> => {
   try {
-    const response = await fetch("https://admin.anantainternationals.com/api/resetPassword", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mobile,
-        password,
-      }),
-    });
+    const response = await fetch(
+      "https://admin.anantainternationals.com/api/resetPassword",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ mobile, password }),
+        cache: "no-store",
+      }
+    );
 
-    const data = response.json();
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to reset password.");
+    // Read the body exactly once - the previous version called response.json()
+    // twice, which throws "Body has already been read" and hid the real error.
+    let payload: any = null;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
     }
 
-    return data; // Assuming the API returns a success response as JSON
+    if (!response.ok) {
+      return {
+        success: false,
+        status: payload?.status ?? response.status,
+        message: payload?.message || "Failed to reset password.",
+      };
+    }
+
+    return {
+      success: true,
+      status: payload?.status ?? 200,
+      message: payload?.message || "Password changed successfully.",
+    };
   } catch (error) {
     console.error("Error in resetPassword:", error);
-    throw error;
+    return {
+      success: false,
+      status: 503,
+      message: "Could not reach the server. Please try again.",
+    };
   }
 };

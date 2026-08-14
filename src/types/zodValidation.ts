@@ -5,7 +5,7 @@ export const registerSchema = z
   fname: z.string().min(1, "First name is required"),
   lname: z.string().min(1, "Last name is required"),
   email: z.string().min(1, "Email is required").email("Invalid email"),
-  mobile: z.string().min(1,"Maximum 10 numbers should be there").optional(),
+  mobile: z.string().regex(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(8, "Password confirmation is required"),
 })
@@ -55,6 +55,20 @@ export const passwordResetSchema = z
   });
 
 export type PasswordResetFormInputs = z.infer<typeof passwordResetSchema>;
+
+// Forgot-password flow: no current password, the OTP is the proof of ownership.
+export const forgotPasswordSchema = z
+  .object({
+    mobile: z.string().regex(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
+
+export type ForgotPasswordFormInputs = z.infer<typeof forgotPasswordSchema>;
 
 export const InitialDataSchema = z.object({
   id: z.string(),

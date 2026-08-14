@@ -1,46 +1,53 @@
 "use client";
 import React, { useState } from "react";
 import "@/styles/css/registration.css";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormInputs, loginSchema } from "@/types/zodValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { loginAction } from "../_actions/loginServerActions";
+import Link from "next/link";
 
 const LoginForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({ resolver: zodResolver(loginSchema) });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [formError, setFormError] = useState("");
   const router = useRouter();
+
   const onSubmit = async (data: LoginFormInputs) => {
-  const user = await loginAction(data);
+    setFormError("");
 
-  if (user.status === 400 || user.data.id === undefined) {
-    alert("Login failed");
-    return;
-  }
+    // A single sign-in call: `authorize` in the NextAuth options already runs
+    // loginAction server-side, so calling it here as well doubled every login.
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
 
-  const result = await signIn("credentials", {
-    redirect: false,
-    email: data.email,
-    password: data.password,
-  });
+    if (!result || result.error) {
+      setFormError(
+        result?.error && result.error !== "CredentialsSignin"
+          ? result.error
+          : "Invalid email/mobile number or password."
+      );
+      return;
+    }
 
-  if (user.status === 400 || result?.error) {
-    console.error("SignIn failed", result?.error);
-    alert("Login failed");
-    return;
-  }
+    const session = await getSession();
+    const id = session?.user?.id;
 
-  // alert("Login successful");
-  const id = user.data.id;
-  router.push(`/artist/edit/${id}`);
-};
+    if (!id) {
+      setFormError("Signed in, but the profile could not be loaded. Please try again.");
+      return;
+    }
 
+    router.push(`/artist/edit/${id}`);
+  };
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -53,6 +60,11 @@ const LoginForm = () => {
         <div className="main-agileinfo">
           <div className="agileits-top">
             <form onSubmit={handleSubmit(onSubmit)} method="POST">
+              {formError && (
+                <div className="alert alert-danger" role="alert">
+                  {formError}
+                </div>
+              )}
               <input
                 className="text"
                 type="text"
@@ -60,7 +72,7 @@ const LoginForm = () => {
                 placeholder="Enter email or mobile no"
                 required
               />
-              {/* <span style={{ color: "red" }}>{errors.email?.message}</span> */}
+              <span style={{ color: "red" }}>{errors.email?.message}</span>
               <div className="input-block">
                 <i
                   className={`fa ${
@@ -78,13 +90,17 @@ const LoginForm = () => {
                 />
                 <span style={{ color: "red" }}>{errors.password?.message}</span>
               </div>
-              <button type="submit" className="tp-btn rounded-pill">
-                Login
+              <button
+                type="submit"
+                className="tp-btn rounded-pill"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Logging in..." : "Login"}
               </button>
               <p className="mt-2">
-                <a href="/resetpassword" style={{ color: "blue" }}>
+                <Link href="/resetpassword" style={{ color: "blue" }}>
                   <u>Forgot Password</u>
-                </a>
+                </Link>
               </p>
             </form>
           </div>

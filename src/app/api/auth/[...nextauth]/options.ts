@@ -36,15 +36,20 @@ export const options: NextAuthOptions = {
         };
 
         const user = await loginAction(data);
-        if (user.status === null || user.data.id === undefined) {
-          throw new Error("Invalid credentials");
+
+        // loginAction can return an error shape (bad credentials, backend
+        // unreachable); never assume `data` is a populated object.
+        const account = user?.data as Record<string, unknown> | undefined;
+        if (!user || user.status !== 200 || !account || account.id === undefined) {
+          throw new Error(user?.message || "Invalid credentials");
         }
+
         return {
-          id: String(user.data.id),
-          email: user.data.email,
-          link: user.data.link,
-          file: user.data.file,
-          fname: user.data.fname,
+          id: String(account.id),
+          email: account.email as string,
+          link: account.link as string,
+          file: account.file as string,
+          fname: account.fname as string,
         };
       },
     }),
