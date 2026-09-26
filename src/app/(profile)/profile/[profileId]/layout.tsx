@@ -3,6 +3,7 @@ import "@/styles/css/viewprofile.css";
 import Script from "next/script";
 import NextAuthProvider from "@/app/(home)/provider/nextAuthProvider";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { options } from "@/app/api/auth/[...nextauth]/options";
 import { editProfile } from "@/app/(artist)/artist/edit/[id]/_actions/editServerActions";
 
@@ -13,8 +14,20 @@ interface LayoutProps {
 const RootViewLayout: React.FC<LayoutProps> = async ({ children }) => {
   const session = await getServerSession(options);
 
-  const result = await editProfile(session?.user.id!);
-  const userFavourite = result.data.artist.favourite;
+  // No valid session (logged out, or a cookie signed with another secret):
+  // the profile page needs session.user.id, so send the user to log in.
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  let userFavourite: number | undefined;
+  try {
+    const result = await editProfile(session.user.id);
+    userFavourite = result?.data?.artist?.favourite;
+  } catch (error) {
+    // Fall back to the default theme rather than crashing the page.
+    console.error("Failed to load profile theme:", error);
+  }
   const getFavouriteStylesheet = () => {
     switch (userFavourite) {
       case 0 :

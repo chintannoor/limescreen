@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { getPublicProfileUrl } from "@/lib/profileLink";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,7 @@ const Header = () => {
     }
 
     navigator.clipboard
-      .writeText(`https://limescreen.net/${userLink}`)
+      .writeText(getPublicProfileUrl(userLink))
       .then(() => {
         alert("Link copied to clipboard");
       })
@@ -153,7 +154,7 @@ const Header = () => {
                               >
                                 <li>
                                   <Link
-                                    href={`/profile/${session?.user.link}`}
+                                    href={`/profile/${encodeURIComponent(session?.user.link ?? "")}`}
                                     style={{
                                       height: "20px",
                                       fontSize: "15px",
@@ -283,7 +284,7 @@ const Header = () => {
                                   <div className="dropdown-menu">
                                     <li>
                                       <Link
-                                        href={`/profile/${session?.user.link}`}
+                                        href={`/profile/${encodeURIComponent(session?.user.link ?? "")}`}
                                         className="theme-btn"
                                       >
                                         View Profile
@@ -403,7 +404,7 @@ const Header = () => {
                           <div className="dropdown-menu">
                             <li>
                               <Link
-                                href={`/profile/${session?.user.link}`}
+                                href={`/profile/${encodeURIComponent(session?.user.link ?? "")}`}
                                 className="theme-btn"
                               >
                                 View Profile

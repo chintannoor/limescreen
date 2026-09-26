@@ -8,6 +8,13 @@ import { APIResponse } from "@/types/types";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { viewProfile } from "../_actions/viewProfileServerActions";
+import { safeDecode } from "@/lib/profileLink";
+
+const S3_BASE_URL = "https://my-limescreen.s3.eu-north-1.amazonaws.com";
+const FALLBACK_PROFILE_IMAGE = "/assets/images/main-logo.png";
+
+const profileImageUrl = (file?: string | null) =>
+  file ? `${S3_BASE_URL}${file}` : FALLBACK_PROFILE_IMAGE;
 
 const ViewProfilePage = () => {
   const [userData, setUserData] = useState<APIResponse["data"] | null>(null);
@@ -18,20 +25,21 @@ const ViewProfilePage = () => {
   });
   const whatsappLink = `https://api.whatsapp.com/send?phone=${userData?.artist.wmobile}&text=Recently we have seen your profile would like to offer you some paid project.Kindly connect with us for further details..`;
   const { profileId } = useParams();
+  // useParams() returns the segment still percent-encoded (e.g. "AARON%20C30459").
+  // The backend matches on the raw link, so decode it before calling the API.
+  const rawProfileId = Array.isArray(profileId) ? profileId[0] : profileId;
+  const link = rawProfileId ? safeDecode(rawProfileId) : "";
   const { data: session } = useSession();
   const id = session?.user.id;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!profileId || !id) {
+        if (!link || !id) {
           console.warn("Profile ID or User ID is missing. Skipping fetch.");
           return;
         }
 
-        const result = (await viewProfile(
-          profileId.toString(),
-          id
-        )) as APIResponse;
+        const result = (await viewProfile(link, id)) as APIResponse;
 
         if (result.status !== 200 || !result.data) {
           console.error("Failed to fetch valid user profile data.");
@@ -60,7 +68,7 @@ const ViewProfilePage = () => {
     };
 
     fetchData();
-  }, [profileId, id, reset]);
+  }, [link, id, reset]);
 
   // Show button when scrolling down
   useEffect(() => {
@@ -88,7 +96,7 @@ const ViewProfilePage = () => {
           <div className="logo-area">
             <a>
               <img
-                src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
+                src={profileImageUrl(userData?.artist.file)}
                 alt="personal-logo"
               />
             </a>
@@ -375,7 +383,7 @@ const ViewProfilePage = () => {
             <div className="logo">
               <Link href="/">
                 <img
-                  src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
+                  src={profileImageUrl(userData?.artist.file)}
                   alt="Logo"
                 />
               </Link>
@@ -427,7 +435,7 @@ const ViewProfilePage = () => {
             <div className="menu-header">
               <Link href="/" className="logo">
                 <img
-                  src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
+                  src={profileImageUrl(userData?.artist.file)}
                   alt="Personal Portfolio"
                 />
               </Link>
@@ -629,7 +637,7 @@ const ViewProfilePage = () => {
                     <img
                       id="border"
                       className="gradient-border"
-                      src={`https://my-limescreen.s3.eu-north-1.amazonaws.com${userData?.artist.file}`}
+                      src={profileImageUrl(userData?.artist.file)}
                       alt="User"
                     />
                   </div>

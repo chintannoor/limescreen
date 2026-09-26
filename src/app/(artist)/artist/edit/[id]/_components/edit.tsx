@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { getPublicProfileUrl } from "@/lib/profileLink";
 import "@/styles/css/registration.css";
 import {
   APIResponse,
@@ -142,7 +143,7 @@ export default function ProfileSettings() {
     }
 
     navigator.clipboard
-      .writeText(`https://limescreen.net/${userLink}`)
+      .writeText(getPublicProfileUrl(userLink))
       .then(() => {
         alert("Link copied to clipboard");
       })

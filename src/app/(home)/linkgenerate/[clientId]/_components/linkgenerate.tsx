@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getPublicProfileUrl } from "@/lib/profileLink";
 import {
   CoupenApplyFormInputs,
   coupenApplySchema,
@@ -91,11 +92,11 @@ const LinkGeneratePage = () => {
                   <p> Your Profile Link </p>
                 </h5>
                 <Link
-                  href={`/profile/${session?.user.link}`}
+                  href={`/profile/${encodeURIComponent(session?.user.link ?? "")}`}
                   target="_blank"
                   className="btn btn-primary w-100"
                 >
-                  https://admin.anantainternationals.com/{`profile/${session?.user.link}`}
+                  {getPublicProfileUrl(session?.user.link ?? "")}
                 </Link>
               </>
             )}
