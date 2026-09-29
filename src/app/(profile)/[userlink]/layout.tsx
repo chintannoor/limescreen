@@ -19,7 +19,7 @@ const RootViewLayout= async ({ children,params }: RootViewLayoutProps ) => {
 
 
   const result = await sharedViewProfile(userlink); // Pass empty objects as req and res
-  const userFavourite = result.data.artist.favourite;
+  const userFavourite = result?.data?.artist?.favourite;
   const getFavouriteStylesheet = () => {
     switch (userFavourite) {
       case 0 :

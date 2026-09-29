@@ -23,7 +23,7 @@ const ViewProfilePage = () => {
   const { reset } = useForm<InitialDatas>({
     resolver: zodResolver(InitialDataSchema),
   });
-  const whatsappLink = `https://api.whatsapp.com/send?phone=${userData?.artist.wmobile}&text=Recently we have seen your profile would like to offer you some paid project.Kindly connect with us for further details..`;
+  const whatsappLink = `https://api.whatsapp.com/send?phone=${userData?.artist?.wmobile}&text=Recently we have seen your profile would like to offer you some paid project.Kindly connect with us for further details..`;
   const { profileId } = useParams();
   // useParams() returns the segment still percent-encoded (e.g. "AARON%20C30459").
   // The backend matches on the raw link, so decode it before calling the API.
@@ -41,27 +41,24 @@ const ViewProfilePage = () => {
 
         const result = (await viewProfile(link, id)) as APIResponse;
 
-        if (result.status !== 200 || !result.data) {
+        // Validate before touching state: committing `{ artist: null }` (a new
+        // profile) makes every `userData?.artist?.x` read throw during render.
+        const artist = result?.data?.artist;
+        if (result?.status !== 200 || !artist) {
           console.error("Failed to fetch valid user profile data.");
           return;
         }
 
-        // Update state with fetched data
-        setUserData(result.data);
-        reset(result.data.artist); // Reset form with artist data
-        setUserData((prevData) => ({
-          artist: {
-            ...prevData?.artist,
-            ...result.data.artist,
-            file: result.data.artist.file || "",
-          }, // Ensure `file` is never undefined
-          images: result.data.images,
-          videos: result.data.videos,
+        setUserData({
+          artist: { ...artist, file: artist.file || "" }, // Ensure `file` is never undefined
+          images: Array.isArray(result.data.images) ? result.data.images : [],
+          videos: Array.isArray(result.data.videos) ? result.data.videos : [],
           country: result.data.country,
           state: result.data.state,
           city: result.data.city,
           validate: result.data.validate,
-        }));
+        });
+        reset(artist); // Reset form with artist data
       } catch (error) {
         console.error("Error loading profile data:", error);
       }
@@ -96,7 +93,7 @@ const ViewProfilePage = () => {
           <div className="logo-area">
             <a>
               <img
-                src={profileImageUrl(userData?.artist.file)}
+                src={profileImageUrl(userData?.artist?.file)}
                 alt="personal-logo"
               />
             </a>
@@ -244,8 +241,8 @@ const ViewProfilePage = () => {
                 <li className="facebook">
                   <a
                     href={
-                      userData?.artist.facebook
-                        ? userData.artist.facebook
+                      userData?.artist?.facebook
+                        ? userData?.artist?.facebook
                         : "https://facebook.com"
                     }
                     target="_blank"
@@ -269,8 +266,8 @@ const ViewProfilePage = () => {
                 <li className="instagram">
                   <a
                     href={
-                      userData?.artist.insta
-                        ? userData.artist.insta
+                      userData?.artist?.insta
+                        ? userData?.artist?.insta
                         : "https://instagram.com"
                     }
                     target="_blank"
@@ -303,8 +300,8 @@ const ViewProfilePage = () => {
                 <li className="linkedin">
                   <a
                     href={
-                      userData?.artist.youtube
-                        ? userData.artist.youtube
+                      userData?.artist?.youtube
+                        ? userData?.artist?.youtube
                         : "https://youtube.com"
                     }
                     target="_blank"
@@ -326,8 +323,8 @@ const ViewProfilePage = () => {
                 <li className="twitter">
                   <a
                     href={
-                      userData?.artist.twitter
-                        ? userData.artist.twitter
+                      userData?.artist?.twitter
+                        ? userData?.artist?.twitter
                         : "https://twitter.com"
                     }
                     target="_blank"
@@ -383,7 +380,7 @@ const ViewProfilePage = () => {
             <div className="logo">
               <Link href="/">
                 <img
-                  src={profileImageUrl(userData?.artist.file)}
+                  src={profileImageUrl(userData?.artist?.file)}
                   alt="Logo"
                 />
               </Link>
@@ -435,7 +432,7 @@ const ViewProfilePage = () => {
             <div className="menu-header">
               <Link href="/" className="logo">
                 <img
-                  src={profileImageUrl(userData?.artist.file)}
+                  src={profileImageUrl(userData?.artist?.file)}
                   alt="Personal Portfolio"
                 />
               </Link>
@@ -498,7 +495,7 @@ const ViewProfilePage = () => {
               <ul className="social-share d-flex liststyle">
                 <li className="facebook">
                   <a
-                    href={userData?.artist.facebook || "https://facebook.com"}
+                    href={userData?.artist?.facebook || "https://facebook.com"}
                     target="_blank"
                   >
                     <svg
@@ -519,7 +516,7 @@ const ViewProfilePage = () => {
                 </li>
                 <li className="instagram">
                   <a
-                    href={userData?.artist.insta || "https://instagram.com"}
+                    href={userData?.artist?.insta || "https://instagram.com"}
                     target="_blank"
                   >
                     <svg
@@ -549,7 +546,7 @@ const ViewProfilePage = () => {
                 </li>
                 <li className="linkedin">
                   <a
-                    href={userData?.artist.youtube || "https://youtube.com"}
+                    href={userData?.artist?.youtube || "https://youtube.com"}
                     target="_blank"
                   >
                     <svg
@@ -568,7 +565,7 @@ const ViewProfilePage = () => {
                 </li>
                 <li className="twitter">
                   <a
-                    href={userData?.artist.twitter || "https://twitter.com"}
+                    href={userData?.artist?.twitter || "https://twitter.com"}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -637,12 +634,12 @@ const ViewProfilePage = () => {
                     <img
                       id="border"
                       className="gradient-border"
-                      src={profileImageUrl(userData?.artist.file)}
+                      src={profileImageUrl(userData?.artist?.file)}
                       alt="User"
                     />
                   </div>
                   <h1>
-                    {userData?.artist.fname}&nbsp;{userData?.artist.lname}
+                    {userData?.artist?.fname}&nbsp;{userData?.artist?.lname}
                   </h1>
                   {/* type headline start */}
                   <span className="cd-headline clip is-full-width">
@@ -650,21 +647,21 @@ const ViewProfilePage = () => {
                     {/* ROTATING TEXT */}
                     <span className="cd-words-wrapper">
                       <b className="is-visible ml-4">
-                        {userData?.artist.category}.
+                        {userData?.artist?.category}.
                       </b>
-                      {userData?.artist.juniormodel ? (
+                      {userData?.artist?.juniormodel ? (
                         <b className="is-hidden ml-4">
-                          {userData.artist.juniormodel}.
+                          {userData?.artist?.juniormodel}.
                         </b>
                       ) : (
                         <b className="is-hidden ml-4">
-                          {userData?.artist.junioractor}.
+                          {userData?.artist?.junioractor}.
                         </b>
                       )}
                     </span>
                   </span>
                   <div className="short-desc">
-                    <p>{userData?.artist.short_description}</p>
+                    <p>{userData?.artist?.short_description}</p>
                   </div>
                   {/* type headline end */}
                   <div className="button-area">
@@ -694,11 +691,11 @@ const ViewProfilePage = () => {
               <div className="col-lg-12 about-info">
                 <div className="about-text">
                   <h3>
-                    {userData?.artist.juniormodel
-                      ? `I'm a ${userData.artist.juniormodel} with Many years of experience.`
-                      : `I'm a ${userData?.artist.junioractor} with Many years of experience.`}
+                    {userData?.artist?.juniormodel
+                      ? `I'm a ${userData?.artist?.juniormodel} with Many years of experience.`
+                      : `I'm a ${userData?.artist?.junioractor} with Many years of experience.`}
                   </h3>
-                  <p>{userData?.artist.description}</p>
+                  <p>{userData?.artist?.description}</p>
                   <div className="btn-bar">
                     <Link href="#contacts" className="rn-btn">
                       <span>Contact Me</span>
@@ -766,7 +763,7 @@ const ViewProfilePage = () => {
                       Body Measurement
                     </a>
                   </li>
-                  {userData?.artist.category === "model" ? (
+                  {userData?.artist?.category === "model" ? (
                     <li className="nav-item">
                       <a
                         className={`nav-link ${
@@ -780,7 +777,7 @@ const ViewProfilePage = () => {
                         aria-controls="experience"
                         aria-selected="false"
                       >
-                        {userData?.artist.category} Info
+                        {userData?.artist?.category} Info
                       </a>
                     </li>
                   ) : (
@@ -797,7 +794,7 @@ const ViewProfilePage = () => {
                         aria-controls="experience"
                         aria-selected="false"
                       >
-                        {userData?.artist.category} Info
+                        {userData?.artist?.category} Info
                       </a>
                     </li>
                   )}
@@ -833,7 +830,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Name:</div>
                             <div className="value">
-                              {userData?.artist.fname} {userData?.artist.lname}
+                              {userData?.artist?.fname} {userData?.artist?.lname}
                             </div>
                           </div>
                         </div>
@@ -841,7 +838,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Father Name:</div>
                             <div className="value">
-                              {userData?.artist.father}
+                              {userData?.artist?.father}
                             </div>
                           </div>
                         </div>
@@ -849,22 +846,22 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Mother Name:</div>
                             <div className="value">
-                              {userData?.artist.mother}
+                              {userData?.artist?.mother}
                             </div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Date Of Birth:</div>
-                            <div className="value">{userData?.artist.dob}</div>
+                            <div className="value">{userData?.artist?.dob}</div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Occupation:</div>
                             <div className="value">
-                              {userData?.artist.juniormodel ||
-                                userData?.artist.junioractor}
+                              {userData?.artist?.juniormodel ||
+                                userData?.artist?.junioractor}
                             </div>
                           </div>
                         </div>
@@ -872,16 +869,16 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Email:</div>
                             <div className="value">
-                              {userData?.artist.email}
+                              {userData?.artist?.email}
                             </div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Phone:</div>
-                            {userData?.artist.show_number && (
+                            {userData?.artist?.show_number && (
                               <div className="value">
-                                +91 {userData.artist.mobile}
+                                +91 {userData?.artist?.mobile}
                               </div>
                             )}
                           </div>
@@ -908,7 +905,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Pincode:</div>
                             <div className="value">
-                              {userData?.artist.pincode}
+                              {userData?.artist?.pincode}
                             </div>
                           </div>
                         </div>
@@ -926,7 +923,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Height:</div>
                             <div className="value">
-                              {userData?.artist.height}
+                              {userData?.artist?.height}
                             </div>
                           </div>
                         </div>
@@ -935,35 +932,35 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Weight:</div>
                             <div className="value">
-                              {userData?.artist.weight} kg
+                              {userData?.artist?.weight} kg
                             </div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Bust:</div>
-                            <div className="value">{userData?.artist.bust}</div>
+                            <div className="value">{userData?.artist?.bust}</div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Waist:</div>
                             <div className="value">
-                              {userData?.artist.waist}
+                              {userData?.artist?.waist}
                             </div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Hips:</div>
-                            <div className="value">{userData?.artist.hips}</div>
+                            <div className="value">{userData?.artist?.hips}</div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Skin Color:</div>
                             <div className="value">
-                              {userData?.artist.skincolor}
+                              {userData?.artist?.skincolor}
                             </div>
                           </div>
                         </div>
@@ -971,7 +968,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Eye Color:</div>
                             <div className="value">
-                              {userData?.artist.eyecolor}
+                              {userData?.artist?.eyecolor}
                             </div>
                           </div>
                         </div>
@@ -979,7 +976,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Hair Color:</div>
                             <div className="value">
-                              {userData?.artist.haircolor}
+                              {userData?.artist?.haircolor}
                             </div>
                           </div>
                         </div>
@@ -987,7 +984,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Clothing Size:</div>
                             <div className="value">
-                              {userData?.artist.cloth}
+                              {userData?.artist?.cloth}
                             </div>
                           </div>
                         </div>
@@ -995,7 +992,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Shoes Size:</div>
                             <div className="value">
-                              {userData?.artist.shoes} number
+                              {userData?.artist?.shoes} number
                             </div>
                           </div>
                         </div>
@@ -1014,7 +1011,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Classic Acting:</div>
                             <div className="value">
-                              {userData?.artist.classic}
+                              {userData?.artist?.classic}
                             </div>
                           </div>
                         </div>
@@ -1022,7 +1019,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Method Acting :</div>
                             <div className="value">
-                              {userData?.artist.method}
+                              {userData?.artist?.method}
                             </div>
                           </div>
                         </div>
@@ -1032,7 +1029,7 @@ const ViewProfilePage = () => {
                               Practical Aesthetic Method:
                             </div>
                             <div className="value">
-                              {userData?.artist.practical}
+                              {userData?.artist?.practical}
                             </div>
                           </div>
                         </div>
@@ -1042,7 +1039,7 @@ const ViewProfilePage = () => {
                               Theatre Stanislavski's Method:
                             </div>
                             <div className="value">
-                              {userData?.artist.theatre}
+                              {userData?.artist?.theatre}
                             </div>
                           </div>
                         </div>
@@ -1050,7 +1047,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Meisner Technique:</div>
                             <div className="value">
-                              {userData?.artist.meisner}
+                              {userData?.artist?.meisner}
                             </div>
                           </div>
                         </div>
@@ -1058,7 +1055,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Lee Strasberg's Method:</div>
                             <div className="value">
-                              {userData?.artist.strasberg}
+                              {userData?.artist?.strasberg}
                             </div>
                           </div>
                         </div>
@@ -1066,7 +1063,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Leading Actor:</div>
                             <div className="value">
-                              {userData?.artist.leading}
+                              {userData?.artist?.leading}
                             </div>
                           </div>
                         </div>
@@ -1074,7 +1071,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Character Actor:</div>
                             <div className="value">
-                              {userData?.artist.character}
+                              {userData?.artist?.character}
                             </div>
                           </div>
                         </div>
@@ -1084,7 +1081,7 @@ const ViewProfilePage = () => {
                               Presentational & Representational:
                             </div>
                             <div className="value">
-                              {userData?.artist.presentational}
+                              {userData?.artist?.presentational}
                             </div>
                           </div>
                         </div>
@@ -1103,7 +1100,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Fashion / Casual Wear :</div>
                             <div className="value">
-                              {userData?.artist.fashion}
+                              {userData?.artist?.fashion}
                             </div>
                           </div>
                         </div>
@@ -1111,7 +1108,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Sport / Fitness :</div>
                             <div className="value">
-                              {userData?.artist.sport}
+                              {userData?.artist?.sport}
                             </div>
                           </div>
                         </div>
@@ -1119,7 +1116,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Swimwear :</div>
                             <div className="value">
-                              {userData?.artist.swimwear}
+                              {userData?.artist?.swimwear}
                             </div>
                           </div>
                         </div>
@@ -1127,7 +1124,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Lingerie :</div>
                             <div className="value">
-                              {userData?.artist.lingerie}
+                              {userData?.artist?.lingerie}
                             </div>
                           </div>
                         </div>
@@ -1135,7 +1132,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Promotional Work :</div>
                             <div className="value">
-                              {userData?.artist.promotional}
+                              {userData?.artist?.promotional}
                             </div>
                           </div>
                         </div>
@@ -1143,7 +1140,7 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Half Dressed :</div>
                             <div className="value">
-                              {userData?.artist.dressed}
+                              {userData?.artist?.dressed}
                             </div>
                           </div>
                         </div>
@@ -1151,21 +1148,21 @@ const ViewProfilePage = () => {
                           <div className="poersonal-tab">
                             <div className="info">Magazine Work :</div>
                             <div className="value">
-                              {userData?.artist.magazine}
+                              {userData?.artist?.magazine}
                             </div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Ramp Walk :</div>
-                            <div className="value">{userData?.artist.ramp}</div>
+                            <div className="value">{userData?.artist?.ramp}</div>
                           </div>
                         </div>
                         <div className="personal-info">
                           <div className="poersonal-tab">
                             <div className="info">Others :</div>
                             <div className="value">
-                              {userData?.artist.others}
+                              {userData?.artist?.others}
                             </div>
                           </div>
                         </div>
@@ -1194,13 +1191,13 @@ const ViewProfilePage = () => {
                                   <div className="inner">
                                     <div className="heading">
                                       <div className="title">
-                                        <h4>{userData?.artist.exp_title}</h4>
+                                        <h4>{userData?.artist?.exp_title}</h4>
                                         {/* <span>University of DVI (1997 - 2001)</span> */}
                                       </div>
                                     </div>
                                     <div className="description">
                                       <p className="description">
-                                        {userData?.artist.experiance}
+                                        {userData?.artist?.experiance}
                                       </p>
                                     </div>
                                   </div>
@@ -1240,8 +1237,8 @@ const ViewProfilePage = () => {
                   <div className="">
                     <div className="tab-content" id="v-pills-tabContent">
                       <div className="client-card">
-                        {userData?.images && userData.images.length > 0 ? (
-                          userData.images.map((image, index) => (
+                        {userData?.images && userData?.images?.length > 0 ? (
+                          userData?.images?.map((image, index) => (
                             <div key={index} className="main-content">
                               <div className="inner text-center">
                                 <div
@@ -1290,8 +1287,8 @@ const ViewProfilePage = () => {
                   <div className="">
                     <div className="tab-content" id="v-pills-tabContent">
                       <div className="client-card">
-                        {userData?.videos && userData.videos.length > 0 ? (
-                          userData.videos.map((video, index) => (
+                        {userData?.videos && userData?.videos?.length > 0 ? (
+                          userData?.videos?.map((video, index) => (
                             <div key={index} className="main-content">
                               <div className="inner text-center">
                                 <video width="150" height="200" controls>
@@ -1343,24 +1340,24 @@ const ViewProfilePage = () => {
                   <div className="col-lg-6">
                     <div className="title-area">
                       <h4 className="title">
-                        {userData?.artist.fname} {userData?.artist.lname}
+                        {userData?.artist?.fname} {userData?.artist?.lname}
                       </h4>
-                      <span>{userData?.artist.category}</span>
+                      <span>{userData?.artist?.category}</span>
                     </div>
                     <div className="description">
                       <p>Connect with me.</p>
                       <span className="phone">
                         Phone:
-                        {userData?.artist.show_number?.toString() === "1" && (
-                          <a href={`tel:+91${userData.artist.mobile}`}>
-                            +91 {userData.artist.mobile}
+                        {userData?.artist?.show_number?.toString() === "1" && (
+                          <a href={`tel:+91${userData?.artist?.mobile}`}>
+                            +91 {userData?.artist?.mobile}
                           </a>
                         )}
                       </span>
                       <span className="mail">
                         Email:{" "}
-                        <a href={`mailTo:${userData?.artist.email}`}>
-                          {userData?.artist.email}
+                        <a href={`mailTo:${userData?.artist?.email}`}>
+                          {userData?.artist?.email}
                         </a>
                       </span>
                     </div>
@@ -1369,7 +1366,7 @@ const ViewProfilePage = () => {
                       <div className="social-icone">
                         <a
                           href={
-                            userData?.artist.facebook || "https://facebook.com"
+                            userData?.artist?.facebook || "https://facebook.com"
                           }
                           target="_blank"
                         >
@@ -1390,7 +1387,7 @@ const ViewProfilePage = () => {
                         </a>
                         <a
                           href={
-                            userData?.artist.insta || "https://instagram.com"
+                            userData?.artist?.insta || "https://instagram.com"
                           }
                           target="_blank"
                         >
@@ -1420,7 +1417,7 @@ const ViewProfilePage = () => {
                         </a>
                         <a
                           href={
-                            userData?.artist.youtube || "https://youtube.com"
+                            userData?.artist?.youtube || "https://youtube.com"
                           }
                           target="_blank"
                         >
@@ -1439,7 +1436,7 @@ const ViewProfilePage = () => {
                         </a>
                         <a
                           href={
-                            userData?.artist.twitter || "https://twitter.com"
+                            userData?.artist?.twitter || "https://twitter.com"
                           }
                           target="_blank"
                         >
@@ -1488,7 +1485,7 @@ const ViewProfilePage = () => {
           </div>
         </div>
         {/* End Contact Area */}
-        {userData?.artist.show_number?.toString() === "1" && (
+        {userData?.artist?.show_number?.toString() === "1" && (
           <a
             href={whatsappLink}
             className="float whatsapp-icon mb-5"

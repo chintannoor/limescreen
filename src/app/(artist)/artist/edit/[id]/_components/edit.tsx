@@ -77,49 +77,54 @@ export default function ProfileSettings() {
           return null;
         }
         const result = (await editProfile(id.toString())) as APIResponse;
-        // Assuming data contains the profile information
-        setFormData(result.data); // Set the form data state
-        reset(result.data.artist); // Use reset to set all form values at once
-        setFormData((prevData) => ({
-          artist: {
-            ...prevData?.artist,
-            ...result.data.artist,
-            file: result.data.artist.file || "",
-          }, // Ensure `file` is never undefined
-          images: result.data.images,
-          videos: result.data.videos,
+        // A freshly registered account can come back without an artist row.
+        // Validate before touching state: committing `{ artist: null }` makes
+        // every `formData?.artist?.x` read below throw during render.
+        const artist = result?.data?.artist;
+        if (result?.status !== 200 || !artist) {
+          setError("Could not load your profile. Please refresh the page.");
+          return;
+        }
+
+        const profileImages = Array.isArray(result.data.images)
+          ? result.data.images
+          : [];
+        const profileVideos = Array.isArray(result.data.videos)
+          ? result.data.videos
+          : [];
+
+        setFormData({
+          artist: { ...artist, file: artist.file || "" }, // Ensure `file` is never undefined
+          images: profileImages,
+          videos: profileVideos,
           country: result.data.country,
           state: result.data.state,
           city: result.data.city,
           validate: result.data.validate,
-        }));
+        });
+        reset(artist); // Use reset to set all form values at once
 
-        if (result.data.artist.country) {
-          setCountryId(result.data.artist.country);
-          fetchStates(result.data.artist.country);
-          if (result.data.artist.state) {
-            setStateId(result.data.artist.state);
-            fetchCities(result.data.artist.state);
+        if (artist.country) {
+          setCountryId(artist.country);
+          fetchStates(artist.country);
+          if (artist.state) {
+            setStateId(artist.state);
+            fetchCities(artist.state);
           }
-          if (result.data.artist.city) {
-            setCityId(result.data.artist.city);
+          if (artist.city) {
+            setCityId(artist.city);
           }
         }
 
-        if (result.data.artist.file) {
-          setProfilePic(result.data.artist.file);
+        if (artist.file) {
+          setProfilePic(artist.file);
         }
 
-        if (result.data.images) {
-          setImages(result.data.images);
-        }
+        setImages(profileImages);
+        setVideos(profileVideos);
 
-        if (result.data.videos) {
-          setVideos(result.data.videos);
-        }
-
-        if (result.data.artist.favourite) {
-          setSelectedColor(result.data.artist.favourite);
+        if (artist.favourite) {
+          setSelectedColor(artist.favourite);
         }
       } catch (error) {
         console.error("Error loading profile data:", error);
@@ -193,7 +198,7 @@ export default function ProfileSettings() {
     // Preview selected image
     const reader = new FileReader();
     reader.onloadend = () => {
-      setProfilePic(profilePic.data.artist.file || "");
+      setProfilePic(profilePic?.data?.artist?.file || "");
     };
     reader.readAsDataURL(selectedFile);
   };
@@ -417,7 +422,7 @@ export default function ProfileSettings() {
           // Fetch the latest image data from the server after upload
           const latestImage = await editProfile(id?.toString());
 
-          if (latestImage.data.images && latestImage.data) {
+          if (latestImage?.data?.images) {
             setImages(latestImage.data.images);
             alert("Image uploaded successfully!");
           } else {
@@ -479,7 +484,7 @@ export default function ProfileSettings() {
           // Fetch the latest video data from the server after upload
           const latestVideo = await editProfile(id?.toString());
 
-          if (latestVideo.data.videos && latestVideo.data) {
+          if (latestVideo?.data?.videos) {
             setVideos(latestVideo.data.videos);
             alert("Video uploaded successfully!");
           } else {
@@ -592,7 +597,7 @@ export default function ProfileSettings() {
               <div className="card mb-4 mb-xl-0">
                 <div className="card-header">
                   Profile Picture
-                  {formData?.artist.token && (
+                  {formData?.artist?.token && (
                     <p className="float-end">
                       <span className="text-success">
                         <b>Valid up to:</b>
@@ -656,7 +661,7 @@ export default function ProfileSettings() {
                           {...register("category")}
                           onChange={handleInputChange}
                           value="model"
-                          checked={formData?.artist.category === "model"}
+                          checked={formData?.artist?.category === "model"}
                           className="mr-1"
                           required
                         />
@@ -669,7 +674,7 @@ export default function ProfileSettings() {
                           {...register("category")}
                           onChange={handleInputChange}
                           value="actor"
-                          checked={formData?.artist.category === "actor"}
+                          checked={formData?.artist?.category === "actor"}
                           className="mr-1"
                           required
                         />
@@ -677,7 +682,7 @@ export default function ProfileSettings() {
                       </div>
                     </div>
                   </div>
-                  {formData?.artist.category === "model" ? (
+                  {formData?.artist?.category === "model" ? (
                     <div className="model-choose space30">
                       <div className="title">
                         Choose <span className="text-danger">*</span>
@@ -690,7 +695,7 @@ export default function ProfileSettings() {
                             {...register("juniormodel")}
                             value="Junior Model"
                             checked={
-                              formData?.artist.juniormodel === "Junior Model"
+                              formData?.artist?.juniormodel === "Junior Model"
                             }
                             onChange={handleInputChange}
                             className="mr-1"
@@ -705,7 +710,7 @@ export default function ProfileSettings() {
                             {...register("juniormodel")}
                             value="Senior Model"
                             checked={
-                              formData?.artist.juniormodel === "Senior Model"
+                              formData?.artist?.juniormodel === "Senior Model"
                             }
                             onChange={handleInputChange}
                             className="mr-1"
@@ -715,7 +720,7 @@ export default function ProfileSettings() {
                         </div>
                       </div>
                     </div>
-                  ) : formData?.artist.category === "actor" ? (
+                  ) : formData?.artist?.category === "actor" ? (
                     <div className="actor-choose space30">
                       <div className="title">Choose</div>
                       <div className="row gx-3">
@@ -726,7 +731,7 @@ export default function ProfileSettings() {
                             {...register("junioractor")}
                             value="Junior Actor"
                             checked={
-                              formData?.artist.junioractor === "Junior Actor"
+                              formData?.artist?.junioractor === "Junior Actor"
                             }
                             onChange={handleInputChange}
                             className="mr-1"
@@ -741,7 +746,7 @@ export default function ProfileSettings() {
                             {...register("junioractor")}
                             value="Senior Actor"
                             checked={
-                              formData?.artist.junioractor === "Senior Actor"
+                              formData?.artist?.junioractor === "Senior Actor"
                             }
                             onChange={handleInputChange}
                             className="mr-1"
@@ -885,7 +890,7 @@ export default function ProfileSettings() {
                           {...register("show_number")}
                           value="1"
                           checked={
-                            formData?.artist.show_number?.toString() === "1"
+                            formData?.artist?.show_number?.toString() === "1"
                           }
                           onChange={handleInputChange}
                           className="ml-1"
@@ -900,7 +905,7 @@ export default function ProfileSettings() {
                           {...register("show_number")}
                           value="0"
                           checked={
-                            formData?.artist.show_number?.toString() === "0"
+                            formData?.artist?.show_number?.toString() === "0"
                           }
                           onChange={handleInputChange}
                           className="ml-1"
@@ -921,7 +926,7 @@ export default function ProfileSettings() {
                         }}
                       >
                         <option value="">-- Select country --</option>
-                        {countries?.data.map((country) => (
+                        {countries?.data?.map((country) => (
                           <option key={country.id} value={country.id}>
                             {country.name}
                           </option>
@@ -941,7 +946,7 @@ export default function ProfileSettings() {
                         required
                       >
                         <option value="">-- Select state --</option>
-                        {states?.data.map((state) => (
+                        {states?.data?.map((state) => (
                           <option key={state.id} value={state.id}>
                             {state.name}
                           </option>
@@ -961,7 +966,7 @@ export default function ProfileSettings() {
                         required
                       >
                         <option value="">-- Select city --</option>
-                        {cities?.data.map((city) => (
+                        {cities?.data?.map((city) => (
                           <option key={city.id} value={city.id}>
                             {city.name}
                           </option>
@@ -1128,7 +1133,7 @@ export default function ProfileSettings() {
                             id="skincolor-fair"
                             {...register("skincolor")}
                             value="Fair"
-                            checked={formData?.artist.skincolor === "Fair"}
+                            checked={formData?.artist?.skincolor === "Fair"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1142,7 +1147,7 @@ export default function ProfileSettings() {
                             id="skincolor-medium"
                             {...register("skincolor")}
                             value="Medium"
-                            checked={formData?.artist.skincolor === "Medium"}
+                            checked={formData?.artist?.skincolor === "Medium"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1156,7 +1161,7 @@ export default function ProfileSettings() {
                             id="skincolor-olive"
                             {...register("skincolor")}
                             value="Olive"
-                            checked={formData?.artist.skincolor === "Olive"}
+                            checked={formData?.artist?.skincolor === "Olive"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1170,7 +1175,7 @@ export default function ProfileSettings() {
                             id="skincolor-dark"
                             {...register("skincolor")}
                             value="Dark"
-                            checked={formData?.artist.skincolor === "Dark"}
+                            checked={formData?.artist?.skincolor === "Dark"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1193,7 +1198,7 @@ export default function ProfileSettings() {
                             id="eyecolor-brown"
                             {...register("eyecolor")}
                             value="Brown"
-                            checked={formData?.artist.eyecolor === "Brown"}
+                            checked={formData?.artist?.eyecolor === "Brown"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1207,7 +1212,7 @@ export default function ProfileSettings() {
                             id="eyecolor-blue"
                             {...register("eyecolor")}
                             value="Blue"
-                            checked={formData?.artist.eyecolor === "Blue"}
+                            checked={formData?.artist?.eyecolor === "Blue"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1221,7 +1226,7 @@ export default function ProfileSettings() {
                             id="eyecolor-black"
                             {...register("eyecolor")}
                             value="Black"
-                            checked={formData?.artist.eyecolor === "Black"}
+                            checked={formData?.artist?.eyecolor === "Black"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1235,7 +1240,7 @@ export default function ProfileSettings() {
                             id="eyecolor-hazel"
                             {...register("eyecolor")}
                             value="Hazel"
-                            checked={formData?.artist.eyecolor === "Hazel"}
+                            checked={formData?.artist?.eyecolor === "Hazel"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1258,7 +1263,7 @@ export default function ProfileSettings() {
                             id="haircolor-brunette"
                             {...register("haircolor")}
                             value="Brunette"
-                            checked={formData?.artist.haircolor === "Brunette"}
+                            checked={formData?.artist?.haircolor === "Brunette"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1272,7 +1277,7 @@ export default function ProfileSettings() {
                             id="haircolor-blonde"
                             {...register("haircolor")}
                             value="Blonde"
-                            checked={formData?.artist.haircolor === "Blonde"}
+                            checked={formData?.artist?.haircolor === "Blonde"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1286,7 +1291,7 @@ export default function ProfileSettings() {
                             id="haircolor-brown"
                             {...register("haircolor")}
                             value="Brown"
-                            checked={formData?.artist.haircolor === "Brown"}
+                            checked={formData?.artist?.haircolor === "Brown"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1300,7 +1305,7 @@ export default function ProfileSettings() {
                             id="haircolor-black"
                             {...register("haircolor")}
                             value="Black"
-                            checked={formData?.artist.haircolor === "Black"}
+                            checked={formData?.artist?.haircolor === "Black"}
                             onChange={handleInputChange}
                             className="mr-1"
                           />
@@ -1340,7 +1345,7 @@ export default function ProfileSettings() {
                       </div>
                     </div>
                   </div>
-                  {formData?.artist.category === "actor" ? (
+                  {formData?.artist?.category === "actor" ? (
                     <div
                       className="acting-info space30"
                       // style={{ display: "none" }}
@@ -1360,7 +1365,7 @@ export default function ProfileSettings() {
                               id="classic"
                               {...register("classic")}
                               value="Yes"
-                              checked={formData.artist.classic === "Yes"}
+                              checked={formData?.artist?.classic === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1372,7 +1377,7 @@ export default function ProfileSettings() {
                               id="classic"
                               {...register("classic")}
                               value="No"
-                              checked={formData.artist.classic === "No"}
+                              checked={formData?.artist?.classic === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1392,7 +1397,7 @@ export default function ProfileSettings() {
                               id="Method"
                               {...register("method")}
                               value="Yes"
-                              checked={formData.artist.method === "Yes"}
+                              checked={formData?.artist?.method === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1404,7 +1409,7 @@ export default function ProfileSettings() {
                               id="method"
                               {...register("method")}
                               value="No"
-                              checked={formData.artist.method === "No"}
+                              checked={formData?.artist?.method === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1424,7 +1429,7 @@ export default function ProfileSettings() {
                               id="practical"
                               {...register("practical")}
                               value="Yes"
-                              checked={formData.artist.practical === "Yes"}
+                              checked={formData?.artist?.practical === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1436,7 +1441,7 @@ export default function ProfileSettings() {
                               id="practical"
                               {...register("practical")}
                               value="No"
-                              checked={formData.artist.practical === "No"}
+                              checked={formData?.artist?.practical === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1456,7 +1461,7 @@ export default function ProfileSettings() {
                               id="theatre"
                               {...register("theatre")}
                               value="Yes"
-                              checked={formData.artist.theatre === "Yes"}
+                              checked={formData?.artist?.theatre === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1468,7 +1473,7 @@ export default function ProfileSettings() {
                               id="theatre"
                               {...register("theatre")}
                               value="No"
-                              checked={formData.artist.theatre === "No"}
+                              checked={formData?.artist?.theatre === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1488,7 +1493,7 @@ export default function ProfileSettings() {
                               id="Meisner"
                               {...register("meisner")}
                               value="Yes"
-                              checked={formData.artist.meisner === "Yes"}
+                              checked={formData?.artist?.meisner === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1500,7 +1505,7 @@ export default function ProfileSettings() {
                               id="Meisner"
                               {...register("meisner")}
                               value="No"
-                              checked={formData.artist.meisner === "No"}
+                              checked={formData?.artist?.meisner === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1520,7 +1525,7 @@ export default function ProfileSettings() {
                               id="Strasberg"
                               {...register("strasberg")}
                               value="Yes"
-                              checked={formData.artist.strasberg === "Yes"}
+                              checked={formData?.artist?.strasberg === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1532,7 +1537,7 @@ export default function ProfileSettings() {
                               id="Strasberg"
                               {...register("strasberg")}
                               value="No"
-                              checked={formData.artist.strasberg === "No"}
+                              checked={formData?.artist?.strasberg === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1552,7 +1557,7 @@ export default function ProfileSettings() {
                               id="leading"
                               {...register("leading")}
                               value="Yes"
-                              checked={formData.artist.leading === "Yes"}
+                              checked={formData?.artist?.leading === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1564,7 +1569,7 @@ export default function ProfileSettings() {
                               id="leading"
                               {...register("leading")}
                               value="No"
-                              checked={formData.artist.leading === "No"}
+                              checked={formData?.artist?.leading === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1584,7 +1589,7 @@ export default function ProfileSettings() {
                               id="Character"
                               {...register("character")}
                               value="Yes"
-                              checked={formData.artist.character === "Yes"}
+                              checked={formData?.artist?.character === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1596,7 +1601,7 @@ export default function ProfileSettings() {
                               id="Character"
                               {...register("character")}
                               value="No"
-                              checked={formData.artist.character === "No"}
+                              checked={formData?.artist?.character === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1616,7 +1621,7 @@ export default function ProfileSettings() {
                               id="Presentational"
                               {...register("presentational")}
                               value="Yes"
-                              checked={formData.artist.presentational === "Yes"}
+                              checked={formData?.artist?.presentational === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1631,7 +1636,7 @@ export default function ProfileSettings() {
                               id="Presentational"
                               {...register("presentational")}
                               value="No"
-                              checked={formData.artist.presentational === "No"}
+                              checked={formData?.artist?.presentational === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1639,7 +1644,7 @@ export default function ProfileSettings() {
                         </div>
                       </div>
                     </div>
-                  ) : formData?.artist.category === "model" ? (
+                  ) : formData?.artist?.category === "model" ? (
                     <div
                       className="model-info space30"
                       // style={{ display: "none" }}
@@ -1659,7 +1664,7 @@ export default function ProfileSettings() {
                               id="fashion-yes"
                               {...register("fashion")}
                               value="Yes"
-                              checked={formData.artist.fashion === "Yes"}
+                              checked={formData?.artist?.fashion === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1671,7 +1676,7 @@ export default function ProfileSettings() {
                               id="fashion-no"
                               {...register("fashion")}
                               value="No"
-                              checked={formData.artist.fashion === "No"}
+                              checked={formData?.artist?.fashion === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1690,7 +1695,7 @@ export default function ProfileSettings() {
                               id="sport-yes"
                               {...register("sport")}
                               value="Yes"
-                              checked={formData.artist.sport === "Yes"}
+                              checked={formData?.artist?.sport === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1702,7 +1707,7 @@ export default function ProfileSettings() {
                               id="sport-no"
                               {...register("sport")}
                               value="No"
-                              checked={formData.artist.sport === "No"}
+                              checked={formData?.artist?.sport === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1721,7 +1726,7 @@ export default function ProfileSettings() {
                               id="swimwear-yes"
                               {...register("swimwear")}
                               value="Yes"
-                              checked={formData.artist.swimwear === "Yes"}
+                              checked={formData?.artist?.swimwear === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1733,7 +1738,7 @@ export default function ProfileSettings() {
                               id="swimwear-no"
                               {...register("swimwear")}
                               value="No"
-                              checked={formData.artist.swimwear === "No"}
+                              checked={formData?.artist?.swimwear === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1752,7 +1757,7 @@ export default function ProfileSettings() {
                               id="lingerie-yes"
                               {...register("lingerie")}
                               value="Yes"
-                              checked={formData.artist.lingerie === "Yes"}
+                              checked={formData?.artist?.lingerie === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1764,7 +1769,7 @@ export default function ProfileSettings() {
                               id="lingerie-no"
                               {...register("lingerie")}
                               value="No"
-                              checked={formData.artist.lingerie === "No"}
+                              checked={formData?.artist?.lingerie === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1783,7 +1788,7 @@ export default function ProfileSettings() {
                               id="promotional-yes"
                               {...register("promotional")}
                               value="Yes"
-                              checked={formData.artist.promotional === "Yes"}
+                              checked={formData?.artist?.promotional === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1798,7 +1803,7 @@ export default function ProfileSettings() {
                               id="promotional-no"
                               {...register("promotional")}
                               value="No"
-                              checked={formData.artist.promotional === "No"}
+                              checked={formData?.artist?.promotional === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1817,7 +1822,7 @@ export default function ProfileSettings() {
                               id="dressed-yes"
                               {...register("dressed")}
                               value="Yes"
-                              checked={formData.artist.dressed === "Yes"}
+                              checked={formData?.artist?.dressed === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1829,7 +1834,7 @@ export default function ProfileSettings() {
                               id="dressed-no"
                               {...register("dressed")}
                               value="No"
-                              checked={formData.artist.dressed === "No"}
+                              checked={formData?.artist?.dressed === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1848,7 +1853,7 @@ export default function ProfileSettings() {
                               id="magazine-yes"
                               {...register("magazine")}
                               value="Yes"
-                              checked={formData.artist.magazine === "Yes"}
+                              checked={formData?.artist?.magazine === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1860,7 +1865,7 @@ export default function ProfileSettings() {
                               id="magazine-no"
                               {...register("magazine")}
                               value="No"
-                              checked={formData.artist.magazine === "No"}
+                              checked={formData?.artist?.magazine === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1879,7 +1884,7 @@ export default function ProfileSettings() {
                               id="ramp-yes"
                               {...register("ramp")}
                               value="Yes"
-                              checked={formData.artist.ramp === "Yes"}
+                              checked={formData?.artist?.ramp === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1891,7 +1896,7 @@ export default function ProfileSettings() {
                               id="ramp-no"
                               {...register("ramp")}
                               value="No"
-                              checked={formData.artist.ramp === "No"}
+                              checked={formData?.artist?.ramp === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1910,7 +1915,7 @@ export default function ProfileSettings() {
                               id="others-yes"
                               {...register("others")}
                               value="Yes"
-                              checked={formData.artist.others === "Yes"}
+                              checked={formData?.artist?.others === "Yes"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -1922,7 +1927,7 @@ export default function ProfileSettings() {
                               id="others-no"
                               {...register("others")}
                               value="No"
-                              checked={formData.artist.others === "No"}
+                              checked={formData?.artist?.others === "No"}
                               onChange={handleInputChange}
                               className="ml-1"
                             />
@@ -2069,7 +2074,7 @@ export default function ProfileSettings() {
                   <div className="video_upload space30">
                     {videos.length > 0 ? (
                       videos.map((item, index) =>
-                        item.videos.startsWith("data:video/") ? (
+                        item.videos?.startsWith("data:video/") ? (
                           <div key={index} className={`yes video${index + 1}`}>
                             <span className="btn_upload">
                               <span>Upload Video</span>
@@ -2205,7 +2210,7 @@ export default function ProfileSettings() {
                 </a>
               </button>
 
-              {!formData?.artist.token && (
+              {!formData?.artist?.token && (
                 <button className="submit-btn p-2 ms-2 me-2 edit_page_btn mr-4 rounded-pill">
                   <a
                     href={`/linkgenerate/${session?.user?.id}`}
@@ -2216,7 +2221,7 @@ export default function ProfileSettings() {
                 </button>
               )}
 
-              {formData?.artist.token && (
+              {formData?.artist?.token && (
                 <button
                   name="copy"
                   className="submit-btn p-2 edit_page_btn rounded-pill"
